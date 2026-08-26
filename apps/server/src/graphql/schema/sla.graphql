@@ -1,0 +1,10 @@
+type SLAInfo {
+  firstResponseDueAt: DateTime!
+  resolutionDueAt: DateTime!
+  firstResponseState: SLAState!
+  resolutionState: SLAState!
+  firstResponseRemainingMinutes: Int!
+  resolutionRemainingMinutes: Int!
+  firstResponseBreached: Boolean!
+  resolutionBreached: Boolean!
+}

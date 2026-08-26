@@ -1,0 +1,14 @@
+type TicketDashboard {
+  totalTickets: Int!
+  openTickets: Int!
+  inProgressTickets: Int!
+  resolvedTickets: Int!
+  closedTickets: Int!
+  atRiskTickets: Int!
+  breachedTickets: Int!
+}
+
+extend type Query {
+  dashboard: TicketDashboard!
+  users(role: UserRole): [User!]!
+}

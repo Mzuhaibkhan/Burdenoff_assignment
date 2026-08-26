@@ -1,0 +1,14 @@
+type Holiday {
+  id: ID!
+  date: String!
+  name: String!
+}
+
+extend type Query {
+  holidays: [Holiday!]!
+}
+
+extend type Mutation {
+  addHoliday(date: String!, name: String!): Holiday!
+  removeHoliday(id: ID!): Boolean!
+}
