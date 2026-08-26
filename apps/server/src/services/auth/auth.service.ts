@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { hash, verify } from '@node-rs/argon2';
+import { z } from 'zod';
 import { registerSchema, loginSchema } from '../../validation/auth.validation';
 import { DuplicateError, NotFoundError, UnauthorizedError } from '../../errors/graphql-errors';
 import { signToken } from '../../auth/jwt';
@@ -7,7 +8,7 @@ import { signToken } from '../../auth/jwt';
 export class AuthService {
   constructor(private prisma: PrismaClient) {}
 
-  async register(input: any) {
+  async register(input: z.infer<typeof registerSchema>) {
     const data = registerSchema.parse(input);
     const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (existing) throw new DuplicateError('User', 'email');
@@ -26,7 +27,7 @@ export class AuthService {
     return { token, user };
   }
   
-  async login(input: any) {
+  async login(input: z.infer<typeof loginSchema>) {
     const data = loginSchema.parse(input);
     const user = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (!user) throw new NotFoundError('User');

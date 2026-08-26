@@ -1,6 +1,7 @@
 import { Resolvers, TicketStatus } from '../../generated/graphql';
 import { requireAuth } from '../../auth/permissions';
 import { TicketStatus as PrismaTicketStatus } from '@prisma/client';
+import { UserRole } from '@shared/types';
 
 export const dashboardResolvers: Resolvers = {
   Query: {
@@ -63,7 +64,7 @@ export const dashboardResolvers: Resolvers = {
     },
     users: async (_, { role }, ctx) => {
       requireAuth(ctx.user);
-      return ctx.services.user.listUsers(role as any) as any;
+      return ctx.services.user.listUsers(role as UserRole | undefined);
     },
   },
 };

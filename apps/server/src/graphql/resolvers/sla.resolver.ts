@@ -1,4 +1,5 @@
-import { Resolvers } from '../../generated/graphql';
+import { Resolvers, SlaState } from '../../generated/graphql';
+import { SLAState } from '@shared/types';
 
 export const slaResolvers: Resolvers = {
   Ticket: {
@@ -12,8 +13,8 @@ export const slaResolvers: Resolvers = {
       return {
         firstResponseDueAt: slaResult.firstResponseDueAt.toISOString(),
         resolutionDueAt: slaResult.resolutionDueAt.toISOString(),
-        firstResponseState: slaResult.firstResponseState as any,
-        resolutionState: slaResult.resolutionState as any,
+        firstResponseState: slaResult.firstResponseState as unknown as SlaState,
+        resolutionState: slaResult.resolutionState as unknown as SlaState,
         firstResponseRemainingMinutes: slaResult.firstResponseRemainingMinutes,
         resolutionRemainingMinutes: slaResult.resolutionRemainingMinutes,
         firstResponseBreached: slaResult.firstResponseBreached,

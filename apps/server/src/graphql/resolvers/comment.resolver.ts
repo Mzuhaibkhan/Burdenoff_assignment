@@ -6,7 +6,7 @@ export const commentResolvers: Resolvers = {
     addComment: async (_, { ticketId, content }, ctx) => {
       const user = requireAuth(ctx.user);
       assertAuthorized(user.role, 'ADD_COMMENT');
-      return ctx.services.comment.addComment(ticketId, content, user.userId) as any;
+      return ctx.services.comment.addComment(ticketId, content, user.userId);
     },
   },
 };

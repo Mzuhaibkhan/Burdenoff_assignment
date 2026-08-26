@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client';
+import { z } from 'zod';
 import { createTicketSchema } from '../../validation/ticket.validation';
 import { NotFoundError, ForbiddenError, InvalidTransitionError } from '../../errors/graphql-errors';
 import { VALID_TRANSITIONS, TicketStatus, Priority, SLAState } from '@shared/types';
@@ -7,7 +8,7 @@ import { SLAService } from '../sla/sla.service';
 export class TicketService {
   constructor(private prisma: PrismaClient, private slaService: SLAService) {}
 
-  async createTicket(input: any, reporterId: string) {
+  async createTicket(input: z.infer<typeof createTicketSchema>, reporterId: string) {
     const data = createTicketSchema.parse(input);
     return this.prisma.ticket.create({
       data: {
