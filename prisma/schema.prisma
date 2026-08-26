@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───
+
+enum UserRole {
+  REPORTER
+  AGENT
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+// ─── Models ───
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime @default(now())
+
+  // Relations
+  reportedTickets Ticket[]  @relation("TicketReporter")
+  assignedTickets Ticket[]  @relation("TicketAssignee")
+  comments        Comment[]
+
+  // Indexes
+  @@index([role])
+  @@index([email])
+}
+
+model Ticket {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  priority    Priority
+  status      TicketStatus @default(OPEN)
+
+  // Reporter (always set)
+  reporterId String
+  reporter   User   @relation("TicketReporter", fields: [reporterId], references: [id])
+
+  // Assignee (nullable — set when agent picks up)
+  assigneeId String?
+  assignee   User?   @relation("TicketAssignee", fields: [assigneeId], references: [id])
+
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  firstResponseAt DateTime?              // Set when first non-reporter comments
+  resolvedAt      DateTime?              // Set when ticket is resolved
+
+  // Relations
+  comments Comment[]
+
+  // Indexes for query performance
+  @@index([status])
+  @@index([priority])
+  @@index([assigneeId])
+  @@index([reporterId])
+  @@index([createdAt])
+  @@index([status, priority])            // Composite for filtered listing
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // Indexes
+  @@index([ticketId])
+  @@index([authorId])
+  @@index([ticketId, createdAt])         // For chronological comment listing
+}
+
+model Holiday {
+  id   String   @id @default(cuid())
+  date DateTime @db.Date                 // Date-only, no time component
+  name String
+
+  @@unique([date])
+  @@index([date])
+}

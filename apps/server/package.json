@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir dist --target bun",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "~6.4.0",
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.7.0",
+    "@graphql-tools/load-files": "^7.0.0",
+    "@graphql-tools/merge": "^9.0.0",
+    "@node-rs/argon2": "^2.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "zod": "^3.23.0",
+    "dataloader": "^2.2.0",
+    "@shared/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.0",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.0",
+    "@graphql-codegen/typescript-resolvers": "^4.0.0",
+    "prisma": "~6.4.0"
+  }
+}
