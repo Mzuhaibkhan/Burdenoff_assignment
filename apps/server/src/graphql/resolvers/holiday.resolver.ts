@@ -8,7 +8,7 @@ export const holidayResolvers: Resolvers = {
       const holidays = await ctx.services.holiday.getHolidays();
       return holidays.map(h => ({
         id: h.id,
-        date: h.date.toISOString(),
+        date: h.date,
         name: h.name,
       }));
     },
@@ -20,7 +20,7 @@ export const holidayResolvers: Resolvers = {
       const holiday = await ctx.services.holiday.addHoliday(date, name);
       return {
         id: holiday.id,
-        date: holiday.date.toISOString(),
+        date: holiday.date,
         name: holiday.name,
       };
     },

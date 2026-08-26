@@ -6,15 +6,17 @@ import { createContext } from './context';
 import { resolvers } from './graphql/resolvers';
 import { env } from './env';
 
+import * as path from 'path';
+
 // Load all .graphql SDL files
 const typeDefs = mergeTypeDefs(
-  loadFilesSync('src/graphql/schema/**/*.graphql', { cwd: import.meta.dir + '/..' })
+  loadFilesSync(path.join(import.meta.dir, 'graphql/schema/**/*.graphql'))
 );
 
 const schema = createSchema({ typeDefs, resolvers: resolvers as any });
 
 const yoga = createYoga({
-  schema,
+  schema: schema as any,
   context: ({ request }) => createContext(request as any),
   cors: {
     origin: env.CORS_ORIGIN,
