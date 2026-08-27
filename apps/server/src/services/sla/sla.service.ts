@@ -63,9 +63,19 @@ export class SLAService {
     if (frozenAt) {
       // Clock frozen — compare elapsed at freeze time vs budget
       const elapsed = getElapsedBusinessMinutes(createdAt, frozenAt, this.config, holidays);
-      const breached = elapsed >= budgetMinutes;
+      const percentage = elapsed / budgetMinutes;
+
+      let state: 'ON_TRACK' | 'AT_RISK' | 'BREACHED';
+      if (percentage >= 1) {
+        state = 'BREACHED';
+      } else if (percentage >= 0.75) {
+        state = 'AT_RISK';
+      } else {
+        state = 'ON_TRACK';
+      }
+
       return {
-        state: breached ? 'BREACHED' : 'ON_TRACK',
+        state,
         remainingMinutes: Math.max(0, budgetMinutes - elapsed),
       };
     }

@@ -43,38 +43,73 @@ export class TicketService {
     if (filters.priority) where.priority = filters.priority;
     if (filters.assigneeId) where.assigneeId = filters.assigneeId;
 
-    const tickets = await this.prisma.ticket.findMany({
-      where,
-      take: limit + 1,
-      ...(pagination.cursor ? { cursor: { id: pagination.cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
-      include: { reporter: true, assignee: true },
-    });
+    let nodes: any[] = [];
+    let hasNextPage = false;
+    let currentCursor = pagination.cursor;
 
-    const hasNextPage = tickets.length > limit;
-    const nodes = hasNextPage ? tickets.slice(0, limit) : tickets;
-
-    let filteredNodes = nodes;
     if (filters.slaState) {
-      filteredNodes = nodes.filter((ticket) => {
-        const sla = this.slaService.computeSLA({
-          priority: ticket.priority,
-          createdAt: ticket.createdAt,
-          firstResponseAt: ticket.firstResponseAt,
-          resolvedAt: ticket.resolvedAt,
+      // Loop to fetch until we satisfy the limit
+      while (nodes.length <= limit) {
+        const batchLimit = limit * 2;
+        const batch = await this.prisma.ticket.findMany({
+          where,
+          take: batchLimit + 1,
+          ...(currentCursor ? { cursor: { id: currentCursor }, skip: 1 } : {}),
+          orderBy: { createdAt: 'desc' },
+          include: { reporter: true, assignee: true },
         });
-        return sla.firstResponseState === filters.slaState
-            || sla.resolutionState === filters.slaState;
+
+        const batchHasNext = batch.length > batchLimit;
+        const actualBatch = batchHasNext ? batch.slice(0, batchLimit) : batch;
+
+        if (actualBatch.length === 0) break;
+
+        for (const ticket of actualBatch) {
+          const sla = this.slaService.computeSLA({
+            priority: ticket.priority,
+            createdAt: ticket.createdAt,
+            firstResponseAt: ticket.firstResponseAt,
+            resolvedAt: ticket.resolvedAt,
+          });
+          
+          if (sla.firstResponseState === filters.slaState || sla.resolutionState === filters.slaState) {
+            nodes.push(ticket);
+            if (nodes.length > limit) {
+              hasNextPage = true;
+              break;
+            }
+          }
+        }
+
+        if (nodes.length > limit) break;
+        if (!batchHasNext) break;
+        
+        currentCursor = actualBatch[actualBatch.length - 1].id;
+      }
+      
+      if (hasNextPage) {
+        nodes.pop(); // Remove the extra node used for peek
+      }
+    } else {
+      const tickets = await this.prisma.ticket.findMany({
+        where,
+        take: limit + 1,
+        ...(pagination.cursor ? { cursor: { id: pagination.cursor }, skip: 1 } : {}),
+        orderBy: { createdAt: 'desc' },
+        include: { reporter: true, assignee: true },
       });
+
+      hasNextPage = tickets.length > limit;
+      nodes = hasNextPage ? tickets.slice(0, limit) : tickets;
     }
 
     const totalCount = await this.prisma.ticket.count({ where });
 
     return {
-      nodes: filteredNodes,
+      nodes,
       pageInfo: {
         hasNextPage,
-        endCursor: filteredNodes.length > 0 ? filteredNodes[filteredNodes.length - 1].id : null,
+        endCursor: nodes.length > 0 ? nodes[nodes.length - 1].id : null,
       },
       totalCount,
     };

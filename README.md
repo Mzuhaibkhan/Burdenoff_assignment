@@ -253,17 +253,15 @@ mutation CreateTicket {
 ```graphql
 query ListTickets {
   tickets(take: 10) {
-    edges {
-      node {
-        id
-        title
-        status
-        priority
-        createdAt
-        sla {
-          firstResponseState
-          resolutionState
-        }
+    nodes {
+      id
+      title
+      status
+      priority
+      createdAt
+      sla {
+        firstResponseState
+        resolutionState
       }
     }
     pageInfo {
