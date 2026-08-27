@@ -1,5 +1,7 @@
 import type { BusinessHoursConfig } from './types';
 
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
+
 // Helper: Get local date components in a specific timezone
 function getLocalParts(date: Date, tz: string) {
   const formatter = new Intl.DateTimeFormat('en-US', {
@@ -31,33 +33,9 @@ function getLocalParts(date: Date, tz: string) {
 
 // Helper: Set local time in timezone and return UTC date
 function setLocalTime(date: Date, tz: string, hour: number, minute: number): Date {
-  const parts = getLocalParts(date, tz);
-  
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: tz,
-    timeZoneName: 'longOffset',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
-  
-  const tzString = formatter.format(date);
-  const offsetStringMatch = tzString.match(/GMT([+-]\d{2}):?(\d{2})?/);
-  
-  let offset = 'Z';
-  if (offsetStringMatch) {
-     const sign = offsetStringMatch[1][0];
-     const hh = offsetStringMatch[1].slice(1).padStart(2, '0');
-     const mm = offsetStringMatch[2] ? offsetStringMatch[2].padStart(2, '0') : '00';
-     offset = `${sign}${hh}:${mm}`;
-  }
-  
-  const isoStr = `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00${offset}`;
-  
-  return new Date(isoStr);
+  const localDateStr = formatInTimeZone(date, tz, 'yyyy-MM-dd');
+  const targetStr = `${localDateStr} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
+  return fromZonedTime(targetStr, tz);
 }
 
 export function isWeekend(date: Date, tz: string): boolean {
