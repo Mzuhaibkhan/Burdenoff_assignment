@@ -14,6 +14,7 @@ export interface SLAComputeInput {
   createdAt: Date;
   firstResponseAt: Date | null;
   resolvedAt: Date | null;
+  timezone?: string | null;
 }
 
 export interface SLAResult {

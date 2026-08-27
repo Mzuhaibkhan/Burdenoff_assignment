@@ -30,6 +30,7 @@ const yoga = createYoga({
 
 const server = Bun.serve({
   port: env.PORT,
+  hostname: '0.0.0.0',
   fetch: yoga.fetch,
 });
 

@@ -124,21 +124,30 @@ Copy the `.env.example` file to `.env` in the root of the project:
 - [Bun](https://bun.sh/) (v1.0+)
 - [Docker](https://www.docker.com/) & Docker Compose
 
-### Standard Setup Flow
+### Docker Setup (Full Stack)
 
-To get everything running quickly with default test data, run the following commands in sequence:
+To run the entire application (Database, Backend, and Frontend) using Docker, simply run:
 
 ```bash
-docker compose up -d && bun install && bun run gendb && bun run dev
+docker compose up -d --build
 ```
 
-### Detailed Setup Steps
+This will automatically start the database, apply migrations, and spin up both the server and the web app.
+- **Frontend App**: `http://localhost:5173`
+- **Backend / GraphiQL**: `http://localhost:4000/graphql`
 
-If you need to run specific parts of the setup manually:
+To populate the database with test users and sample data while running in Docker:
+```bash
+docker compose exec server sh -c "cd /app && bun run seed"
+```
 
-1. **Start the Database**
+### Local Development Setup
+
+If you prefer to run the application locally for development, run the following commands in sequence:
+
+1. **Start only the Database**
    ```bash
-   docker compose up -d
+   docker compose up -d postgres
    ```
 
 2. **Install Dependencies**

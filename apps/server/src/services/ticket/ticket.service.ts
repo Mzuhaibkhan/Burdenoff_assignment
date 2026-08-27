@@ -70,6 +70,7 @@ export class TicketService {
             createdAt: ticket.createdAt,
             firstResponseAt: ticket.firstResponseAt,
             resolvedAt: ticket.resolvedAt,
+            timezone: ticket.timezone,
           });
           
           if (sla.firstResponseState === filters.slaState || sla.resolutionState === filters.slaState) {

@@ -19,6 +19,33 @@ services:
       timeout: 5s
       retries: 5
 
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: burdenoff-server
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/burdenoff
+      - JWT_SECRET=super-secret-jwt-key-that-is-at-least-32-chars
+      - PORT=4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: burdenoff-web
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+
 volumes:
   pgdata:
     driver: local

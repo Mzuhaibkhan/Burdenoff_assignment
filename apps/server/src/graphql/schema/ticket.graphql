@@ -24,6 +24,7 @@ type Ticket {
   updatedAt: DateTime!
   firstResponseAt: DateTime
   resolvedAt: DateTime
+  timezone: String
   sla: SLAInfo!
   comments: [Comment!]!
 }
@@ -38,6 +39,7 @@ input CreateTicketInput {
   title: String!
   description: String!
   priority: Priority!
+  timezone: String
 }
 
 extend type Query {

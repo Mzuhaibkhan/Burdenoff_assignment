@@ -34,6 +34,21 @@ export class HolidayService {
     return holiday;
   }
 
+  async updateHoliday(id: string, dateStr?: string | null, name?: string | null) {
+    const data: any = {};
+    if (name) data.name = name;
+    if (dateStr) {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) throw new Error("Invalid date");
+      data.date = date;
+    }
+    
+    const holiday = await this.prisma.holiday.update({ where: { id }, data });
+    this.invalidateCache();
+    await this.refreshCache();
+    return holiday;
+  }
+
   async removeHoliday(id: string) {
     await this.prisma.holiday.delete({ where: { id } });
     this.invalidateCache();

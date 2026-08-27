@@ -10,5 +10,6 @@ extend type Query {
 
 extend type Mutation {
   addHoliday(date: String!, name: String!): Holiday!
+  updateHoliday(id: ID!, date: String, name: String): Holiday!
   removeHoliday(id: ID!): Boolean!
 }
