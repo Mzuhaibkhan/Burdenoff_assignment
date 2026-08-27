@@ -12,12 +12,17 @@ export class SLAService {
     const holidays = this.getHolidayDates();
     const policy = SLA_POLICIES[input.priority as keyof typeof SLA_POLICIES];
 
+    const localConfig = {
+      ...this.config,
+      timezone: input.timezone || this.config.timezone,
+    };
+
     // 1. Compute deadlines
     const firstResponseDueAt = addBusinessMinutes(
-      input.createdAt, policy.firstResponseMinutes, this.config, holidays
+      input.createdAt, policy.firstResponseMinutes, localConfig, holidays
     );
     const resolutionDueAt = addBusinessMinutes(
-      input.createdAt, policy.resolutionMinutes, this.config, holidays
+      input.createdAt, policy.resolutionMinutes, localConfig, holidays
     );
 
     // 2. Compute first-response SLA state
@@ -28,6 +33,7 @@ export class SLAService {
       policy.firstResponseMinutes,
       now,
       holidays,
+      localConfig
     );
 
     // 3. Compute resolution SLA state
@@ -38,6 +44,7 @@ export class SLAService {
       policy.resolutionMinutes,
       now,
       holidays,
+      localConfig
     );
 
     return {
@@ -59,10 +66,11 @@ export class SLAService {
     budgetMinutes: number,
     now: Date,
     holidays: Date[],
+    config: BusinessHoursConfig,
   ): { state: 'ON_TRACK' | 'AT_RISK' | 'BREACHED'; remainingMinutes: number } {
     if (frozenAt) {
       // Clock frozen — compare elapsed at freeze time vs budget
-      const elapsed = getElapsedBusinessMinutes(createdAt, frozenAt, this.config, holidays);
+      const elapsed = getElapsedBusinessMinutes(createdAt, frozenAt, config, holidays);
       const percentage = elapsed / budgetMinutes;
 
       let state: 'ON_TRACK' | 'AT_RISK' | 'BREACHED';
@@ -81,9 +89,9 @@ export class SLAService {
     }
 
     // Clock still running
-    const elapsed = getElapsedBusinessMinutes(createdAt, now, this.config, holidays);
+    const elapsed = getElapsedBusinessMinutes(createdAt, now, config, holidays);
     const percentage = elapsed / budgetMinutes;
-    const remaining = getRemainingBusinessMinutes(now, dueAt, this.config, holidays);
+    const remaining = getRemainingBusinessMinutes(now, dueAt, config, holidays);
 
     let state: 'ON_TRACK' | 'AT_RISK' | 'BREACHED';
     if (percentage >= 1) {

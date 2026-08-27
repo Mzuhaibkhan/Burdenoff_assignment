@@ -9,6 +9,7 @@ export const slaResolvers: Resolvers = {
         createdAt: parent.createdAt,
         firstResponseAt: parent.firstResponseAt,
         resolvedAt: parent.resolvedAt,
+        timezone: (parent as any).timezone,
       });
       return {
         firstResponseDueAt: slaResult.firstResponseDueAt.toISOString(),

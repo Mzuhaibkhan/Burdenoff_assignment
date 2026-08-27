@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import TicketsPage from './pages/TicketsPage';
 import TicketDetailPage from './pages/TicketDetailPage';
+import HolidaysPage from './pages/HolidaysPage';
 import { Layout } from './components/layout/Layout';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,7 @@ export default function App() {
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/tickets" element={<ProtectedRoute><TicketsPage /></ProtectedRoute>} />
       <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetailPage /></ProtectedRoute>} />
+      <Route path="/holidays" element={<ProtectedRoute><HolidaysPage /></ProtectedRoute>} />
     </Routes>
   );
 }

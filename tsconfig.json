@@ -17,7 +17,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@shared/*": ["./packages/shared/src/*"]
+      "@shared/types": ["./packages/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "prisma/migrations"]

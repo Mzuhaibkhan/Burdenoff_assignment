@@ -1,6 +1,8 @@
 import { expect, test, describe, mock } from 'bun:test';
 import { TicketService } from '../../../apps/server/src/services/ticket/ticket.service';
 import { InvalidTransitionError, ForbiddenError } from '../../../apps/server/src/errors/graphql-errors';
+import { TicketStatus } from '@shared/types';
+
 
 describe('Ticket Service', () => {
   const mockPrisma = {
@@ -17,17 +19,17 @@ describe('Ticket Service', () => {
   const service = new TicketService(mockPrisma, mockSLA);
 
   test('Valid state transition: OPEN -> IN_PROGRESS', async () => {
-    mockPrisma.ticket.findUnique.mockResolvedValueOnce({ id: '1', status: 'OPEN' });
-    mockPrisma.ticket.update.mockResolvedValueOnce({ id: '1', status: 'IN_PROGRESS' });
+    mockPrisma.ticket.findUnique.mockResolvedValueOnce({ id: '1', status: TicketStatus.OPEN });
+    mockPrisma.ticket.update.mockResolvedValueOnce({ id: '1', status: TicketStatus.IN_PROGRESS });
 
-    const result = await service.changeStatus('1', 'IN_PROGRESS');
-    expect(result.status).toBe('IN_PROGRESS');
+    const result = await service.changeStatus('1', TicketStatus.IN_PROGRESS);
+    expect(result.status).toBe(TicketStatus.IN_PROGRESS);
   });
 
   test('Invalid state transition: CLOSED -> IN_PROGRESS', async () => {
-    mockPrisma.ticket.findUnique.mockResolvedValueOnce({ id: '1', status: 'CLOSED' });
+    mockPrisma.ticket.findUnique.mockResolvedValueOnce({ id: '1', status: TicketStatus.CLOSED });
     
-    expect(service.changeStatus('1', 'IN_PROGRESS')).rejects.toThrow(InvalidTransitionError);
+    expect(service.changeStatus('1', TicketStatus.IN_PROGRESS)).rejects.toThrow(InvalidTransitionError);
   });
   
   test('Assign to AGENT', async () => {

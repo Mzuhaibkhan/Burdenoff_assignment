@@ -25,6 +25,16 @@ export const holidayResolvers: Resolvers = {
         name: holiday.name,
       };
     },
+    updateHoliday: async (_, { id, date, name }, ctx) => {
+      const user = requireAuth(ctx.user);
+      assertAuthorized(user.role, 'MANAGE_HOLIDAYS');
+      const holiday = await ctx.services.holiday.updateHoliday(id, date, name);
+      return {
+        id: holiday.id,
+        date: holiday.date,
+        name: holiday.name,
+      };
+    },
     removeHoliday: async (_, { id }, ctx) => {
       const user = requireAuth(ctx.user);
       assertAuthorized(user.role, 'MANAGE_HOLIDAYS');
