@@ -1,6 +1,6 @@
 type Holiday {
   id: ID!
-  date: String!
+  date: DateTime!
   name: String!
 }
 
@@ -9,7 +9,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  addHoliday(date: String!, name: String!): Holiday!
-  updateHoliday(id: ID!, date: String, name: String): Holiday!
+  addHoliday(date: DateTime!, name: String!): Holiday!
+  updateHoliday(id: ID!, date: DateTime, name: String): Holiday!
   removeHoliday(id: ID!): Boolean!
 }
