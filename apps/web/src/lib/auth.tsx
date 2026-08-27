@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -19,6 +20,7 @@ interface AuthState {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('burdenoff_token'));
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('burdenoff_user');
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem('burdenoff_token');
     localStorage.removeItem('burdenoff_user');
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   return (
